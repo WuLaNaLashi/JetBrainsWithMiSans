@@ -292,33 +292,57 @@ def edit_meta_data(font, weight: str, font_name: str, cap_height: int, x_height:
         font.os2_weight = 700
     
     font.os2_vendor = VENDER_NAME
+
+
+    # 修改后的设置字体名称逻辑：只使用基础字体名作为familyname
+    font_family = font_name  # 这将是 MiWithJBMonoHalf 或 MiWithJBMonoHalfNL
+    font_weight = weight
     
-    # 设置字体名称
-    if "Regular" == weight or "Italic" == weight or "Bold" == weight or "BoldItalic" == weight:
-        font_family = font_name
-        font_weight = weight
-        if weight == "BoldItalic":
-            font_weight = font_weight.replace("Italic", " Italic")
-        font.familyname = font_family
-        font.appendSFNTName(0x409, 2, font_weight)
-        font.fontname = f"{font_family}-{font_weight}".replace(" ", "")
-        font.fullname = f"{font_family} {font_weight}"
-        font.weight = font_weight.split(" ")[0]
-    else:
-        font_family = font_name
-        font_weight = weight
-        if "Italic" in weight:
-            font_weight = font_weight.replace("Italic", " Italic")
-        font.familyname = f"{font_family} " + font_weight.split(" ")[0]
-        if "Italic" in weight:
-            font.appendSFNTName(0x409, 2, "Italic")
-        else:
-            font.appendSFNTName(0x409, 2, "Regular")
-        font.fontname = f"{font_family}-{font_weight}".replace(" ", "")
-        font.fullname = f"{font_family} {font_weight}"
-        font.weight = font_weight.split(" ")[0]
+    # 统一设置 familyname 为基本字体名
+    font.familyname = font_family
+    
+    # 其他名称设置保持不变
+    if "BoldItalic" == weight:
+        font_weight = font_weight.replace("Italic", " Italic")
+    elif "Italic" in weight and "Bold" not in weight:
+        font_weight = font_weight.replace("Italic", " Italic")
+        
+    font.appendSFNTName(0x409, 2, font_weight)
+    font.fontname = f"{font_family}-{font_weight}".replace(" ", "")
+    font.fullname = f"{font_family}-{font_weight}".replace(" ", "")
+    font.weight = font_weight.split(" ")[0]
+    
+    # 对于非主要字重，添加Typographic Family和Subfamily名称
+    if weight not in ["Regular", "Italic", "Bold", "BoldItalic"]:
         font.appendSFNTName(0x409, 16, font_family)
         font.appendSFNTName(0x409, 17, font_weight)
+    
+    # 设置字体名称
+    # if "Regular" == weight or "Italic" == weight or "Bold" == weight or "BoldItalic" == weight:
+    #     font_family = font_name
+    #     font_weight = weight
+    #     if weight == "BoldItalic":
+    #         font_weight = font_weight.replace("Italic", " Italic")
+    #     font.familyname = font_family
+    #     font.appendSFNTName(0x409, 2, font_weight)
+    #     font.fontname = f"{font_family}-{font_weight}".replace(" ", "")
+    #     font.fullname = f"{font_family} {font_weight}"
+    #     font.weight = font_weight.split(" ")[0]
+    # else:
+    #     font_family = font_name
+    #     font_weight = weight
+    #     if "Italic" in weight:
+    #         font_weight = font_weight.replace("Italic", " Italic")
+    #     font.familyname = f"{font_family} " + font_weight.split(" ")[0]
+    #     if "Italic" in weight:
+    #         font.appendSFNTName(0x409, 2, "Italic")
+    #     else:
+    #         font.appendSFNTName(0x409, 2, "Regular")
+    #     font.fontname = f"{font_family}-{font_weight}".replace(" ", "")
+    #     font.fullname = f"{font_family} {font_weight}"
+    #     font.weight = font_weight.split(" ")[0]
+    #     font.appendSFNTName(0x409, 16, font_family)
+    #     font.appendSFNTName(0x409, 17, font_weight)
     
     # 设置版权信息
     font.sfnt_names = (
