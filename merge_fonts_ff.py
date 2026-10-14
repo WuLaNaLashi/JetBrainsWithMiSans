@@ -207,9 +207,9 @@ def delete_duplicate_glyphs(zh_font, eng_font):
     except:
         pass
     
-    # 拉丁字符使用英文字体
+    # 拉丁字符使用英文字体（¥ 除外——上方已决定归中文）
     for glyph in zh_font.glyphs():
-        if 0x0000 <= glyph.unicode <= 0x02AF:  # 基本拉丁字母和扩展
+        if 0x0000 <= glyph.unicode <= 0x02AF and glyph.unicode != 0x00A5:  # 基本拉丁字母和扩展
             if glyph.isWorthOutputting():
                 glyph.clear()
         elif 0x1D00 <= glyph.unicode <= 0x1D7F:  # 音标扩展
